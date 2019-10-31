@@ -1,0 +1,31 @@
+.game-field, .container-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  width: 460px;
+}
+
+.container-buttons {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+button {
+  width: 200px;
+  margin: 10px;
+}
+
+.field {
+  width: 90px;
+  height: 90px;
+  border: 1px solid #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.field img {
+  width: 40px;
+  height: 40px;
+}
+
