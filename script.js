@@ -36,8 +36,9 @@ class Wampus {
     this._setWarning(this._randomId);
 
     //Вставляем золото
-    let positionGold  = this._generateId();
-    this.gameField[positionGold] = -1;
+    let positionGold  = this._generateId(false);
+    this.gameField[positionGold] += -10;
+    console.log(positionGold)
   }
 
   _initImages() {
@@ -46,23 +47,34 @@ class Wampus {
       let div = document.querySelector(`[data-index="${key}"]`);
       if( this.gameField[key] == 1 || this.gameField[key] == 2) {
         div.innerHTML += `<img src="images/breeze.png">`;
-      } else if ( this.gameField[key] == 3 ) {
+      } else if ( this.gameField[key] == 3) {
         div.innerHTML += `<img src="images/stench.png">`;
-      } else if ( this.gameField[key] == 4  || this.gameField[key] == 5) {
+      } else if ( this.gameField[key] == 4  || this.gameField[key] == 5 ) {
         div.innerHTML += `<img src="images/breeze-stench.png">`;
-      } else if ( this.gameField[key] == 20 || this.gameField[key] == 21 || this.gameField[key] == 23 || this.gameField[key] == 22 || this.gameField[key] == 24 || this.gameField[key] == 25) {
+      } else if ( this.gameField[key] == 40 || this.gameField[key] == 41 || this.gameField[key] == 43 || this.gameField[key] == 42 || this.gameField[key] == 44 || this.gameField[key] == 45) {
         div.innerHTML += `<img src="images/pit.png">`;
-      } else if ( this.gameField[key] == 30 || this.gameField[key] == 31 || this.gameField[key] == 32 || this.gameField[key] == 33 || this.gameField[key] == 34) {
+      } else if ( this.gameField[key] == 20 || this.gameField[key] == 21 || this.gameField[key] == 22 || this.gameField[key] == 23 || this.gameField[key] == 24) {
         div.innerHTML += `<img src="images/wumpus.png">`;
-      } else if (this.gameField[key] == -1) {
+      } else if (this.gameField[key] == -10) {
         div.innerHTML += `<img src="images/gold.png">`;
+      } else if (this.gameField[key] == 10) {
+        div.innerHTML += `<img src="images/gold.png"><img src="images/wumpus.png">`;
+      } else if (this.gameField[key] == 30) {
+        div.innerHTML += `<img src="images/gold.png"><img src="images/pit.png">`;
+      } else if (this.gameField[key] == -9 || this.gameField[key] == -9) {
+        div.innerHTML += `<img src="images/gold.png"><img src="images/breeze.png">`;
+      } else if (this.gameField[key] == -6  || this.gameField[key] == -5 || this.gameField[key] == -7 || this.gameField[key] == 13) {
+        div.innerHTML += `<img src="images/gold.png"><img src="images/breeze-stench.png">`;
+      } else if (this.gameField[key] == -8) {
+        div.innerHTML += `<img src="images/gold.png"><img src="images/breeze.png">`;
       }
+
     }
     //Вставляем игрока и золото
     document.querySelector(`[data-index="11"]`).innerHTML = `<img id="player" src="images/player.png">`;
   }
 
-  _generateId() {
+  _generateId(flag=true) {
     let i = getRandomInt(1,6),
         j = getRandomInt(1,6);
     let id = parseInt(i.toString() + j.toString());
@@ -70,18 +82,21 @@ class Wampus {
     if(id == 11) {
       id = this._generateId();
     }
-    this._randomId.forEach(item=>{
-      if(item == id) {
-        id = this._generateId();
-      }
-    })
+    if(flag) {
+      this._randomId.forEach(item=>{
+        if(item == id) {
+          id = this._generateId();
+        }
+      })
+    }
+      
     return id;
   }
 
   _setDanger (arr) {
-    this.gameField[arr[0]] += 20;
-    this.gameField[arr[1]] += 20;
-    this.gameField[arr[2]] += 30;
+    this.gameField[arr[0]] += 40;
+    this.gameField[arr[1]] += 40;
+    this.gameField[arr[2]] += 20;
   }
 
   _setWarning(arr) {
@@ -153,8 +168,14 @@ class Wampus {
     document.querySelector(`[data-index="${index}"]`).innerHTML += `<img id="player" src="images/player.png">`;
     //Делаем текущую следующую комнату текущей
     this.positionPlayer = index;
-    if(this.gameField[index] == -1) {
+    if(this.gameField[index] == -10) {
       document.querySelector('.result').innerHTML = 'Вы выигали';
+      document.querySelector('.go').disabled = true;
+      document.querySelector('.automatic-movement').disabled = true;
+      this._complete = true;
+    }
+    if(this.gameField[index] == 10) {
+      document.querySelector('.result').innerHTML = 'Вы нашли золото, но вас съел вампус';
       document.querySelector('.go').disabled = true;
       document.querySelector('.automatic-movement').disabled = true;
       this._complete = true;
@@ -168,7 +189,7 @@ class Wampus {
   go() {
     let nextRooms = this._setNextRooms();
     //Прибибавляем опасность +1 к текущей комнате
-    this.gameField[this.positionPlayer] += 1;
+    this.gameField[this.positionPlayer] += 0.9;
     let index = this._getNextRoom(nextRooms);
     
     this._goToRoom(index);
@@ -201,6 +222,6 @@ buttonAutomaticMovement.addEventListener('click', ()=> {
   let interval = setInterval(()=>{
     wampus.go();
     if(wampus.isComplete()) clearInterval(interval);
-  },1500);
+  },200);
   buttonNext.disabled = true;
 }) 
